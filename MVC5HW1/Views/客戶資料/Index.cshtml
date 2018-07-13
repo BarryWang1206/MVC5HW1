@@ -1,13 +1,13 @@
 ﻿@model IEnumerable<MVC5HW1.Models.客戶資料>
 
 @{
-    ViewBag.Title = "首頁";
+    ViewBag.Title = "客戶資料首頁";
 }
 
-<h2>Index</h2>
+<h2>客戶資料首頁</h2>
 
 <p>
-    @Html.ActionLink("新增客戶資料", "Create")
+    @Html.ActionLink("新增客戶", "Create") | @Html.ActionLink("匯出資料", "Export")
 </p>
 
 @using (Html.BeginForm("Search", "客戶資料", FormMethod.Get, null))
@@ -37,6 +37,9 @@
         <th>
             @Html.DisplayNameFor(model => model.Email)
         </th>
+        <th>
+            @Html.DisplayNameFor(model => model.客戶分類)
+        </th>
         <th></th>
     </tr>
 
@@ -61,9 +64,12 @@
             @Html.DisplayFor(modelItem => item.Email)
         </td>
         <td>
-            @Html.ActionLink("Edit", "Edit", new { id=item.Id }) |
-            @Html.ActionLink("Details", "Details", new { id=item.Id }) |
-            @Html.ActionLink("Delete", "Delete", new { id=item.Id })
+            @Html.DisplayFor(modelItem => item.客戶分類)
+        </td>
+        <td>
+            @Html.ActionLink("Edit", "Edit", new { id = item.Id }) |
+            @Html.ActionLink("Details", "Details", new { id = item.Id }) |
+            @Html.ActionLink("Delete", "Delete", new { id = item.Id })
         </td>
     </tr>
 }

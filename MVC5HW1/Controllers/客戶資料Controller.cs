@@ -10,20 +10,28 @@ using MVC5HW1.Models;
 
 namespace MVC5HW1.Controllers
 {
-    public class 客戶資料Controller : Controller
+    public class 客戶資料Controller : BaseController
     {
-        private 客戶資料Entities db = new 客戶資料Entities();
+        客戶資料Repository repo;
+
+        public 客戶資料Controller()
+        {
+            repo = RepositoryHelper.Get客戶資料Repository();
+        }
 
         // GET: 客戶資料
         public ActionResult Index()
         {
-            return View(db.客戶資料.ToList());
+            var data = repo.All();
+            return View(data);
         }
 
         //關鍵字查詢
-        public ActionResult Search()
+        public ActionResult Search(string keyword)
         {
-            return View();
+            var data = repo.KeyWordSearch(keyword);
+
+            return View("Index", data);
         }
 
 
@@ -34,12 +42,12 @@ namespace MVC5HW1.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            客戶資料 客戶資料 = db.客戶資料.Find(id);
-            if (客戶資料 == null)
+            客戶資料 data = repo.Find(id.Value);
+            if (data == null)
             {
                 return HttpNotFound();
             }
-            return View(客戶資料);
+            return View(data);
         }
 
         // GET: 客戶資料/Create
@@ -53,16 +61,18 @@ namespace MVC5HW1.Controllers
         // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "Id,客戶名稱,統一編號,電話,傳真,地址,Email")] 客戶資料 客戶資料)
+        public ActionResult Create([Bind(Include = "Id,客戶名稱,統一編號,電話,傳真,地址,Email,客戶分類")] 客戶資料 客戶資料)
         {
+            var data = 客戶資料;
+
             if (ModelState.IsValid)
-            {
-                db.客戶資料.Add(客戶資料);
-                db.SaveChanges();
+            {    
+                repo.Add(data);
+                repo.UnitOfWork.Commit();
                 return RedirectToAction("Index");
             }
 
-            return View(客戶資料);
+            return View(data);
         }
 
         // GET: 客戶資料/Edit/5
@@ -72,12 +82,12 @@ namespace MVC5HW1.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            客戶資料 客戶資料 = db.客戶資料.Find(id);
-            if (客戶資料 == null)
+            客戶資料 data = repo.Find(id.Value);
+            if (data == null)
             {
                 return HttpNotFound();
             }
-            return View(客戶資料);
+            return View(data);
         }
 
         // POST: 客戶資料/Edit/5
@@ -85,15 +95,21 @@ namespace MVC5HW1.Controllers
         // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "Id,客戶名稱,統一編號,電話,傳真,地址,Email")] 客戶資料 客戶資料)
+        public ActionResult Edit([Bind(Include = "Id,客戶名稱,統一編號,電話,傳真,地址,Email,客戶分類")] 客戶資料 客戶資料)
         {
+            var data = 客戶資料;
+
             if (ModelState.IsValid)
             {
-                db.Entry(客戶資料).State = EntityState.Modified;
+                var db = repo.UnitOfWork.Context;
+
+                data.是否已刪除 = false;
+
+                db.Entry(data).State = EntityState.Modified;
                 db.SaveChanges();
                 return RedirectToAction("Index");
             }
-            return View(客戶資料);
+            return View(data);
         }
 
         // GET: 客戶資料/Delete/5
@@ -103,12 +119,12 @@ namespace MVC5HW1.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            客戶資料 客戶資料 = db.客戶資料.Find(id);
-            if (客戶資料 == null)
+            客戶資料 data = repo.Find(id.Value);
+            if (data == null)
             {
                 return HttpNotFound();
             }
-            return View(客戶資料);
+            return View(data);
         }
 
         // POST: 客戶資料/Delete/5
@@ -116,9 +132,9 @@ namespace MVC5HW1.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult DeleteConfirmed(int id)
         {
-            客戶資料 客戶資料 = db.客戶資料.Find(id);
-            db.客戶資料.Remove(客戶資料);
-            db.SaveChanges();
+            客戶資料 data = repo.Find(id);
+            repo.Delete(data);
+            repo.UnitOfWork.Commit();
             return RedirectToAction("Index");
         }
 
@@ -126,7 +142,7 @@ namespace MVC5HW1.Controllers
         {
             if (disposing)
             {
-                db.Dispose();
+                //repo.UnitOfWork.Context.Dispose();
             }
             base.Dispose(disposing);
         }

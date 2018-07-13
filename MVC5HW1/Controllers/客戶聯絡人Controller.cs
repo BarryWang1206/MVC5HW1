@@ -10,7 +10,7 @@ using MVC5HW1.Models;
 
 namespace MVC5HW1.Controllers
 {
-    public class 客戶聯絡人Controller : Controller
+    public class 客戶聯絡人Controller : BaseController
     {
         private 客戶資料Entities db = new 客戶資料Entities();
 
@@ -19,6 +19,23 @@ namespace MVC5HW1.Controllers
         {
             var 客戶聯絡人 = db.客戶聯絡人.Include(客 => 客.客戶資料);
             return View(客戶聯絡人.ToList());
+        }
+
+        //關鍵字查詢
+        public ActionResult Search(string keyword)
+        {
+            var 客戶聯絡人 = db.客戶聯絡人.AsQueryable();
+
+            if (!string.IsNullOrEmpty(keyword))
+            {
+                客戶聯絡人 = 客戶聯絡人.Where(p => p.職稱.Contains(keyword) ||
+                p.姓名.ToString().Contains(keyword) ||
+                p.Email.ToString().Contains(keyword) ||
+                p.手機.Contains(keyword) ||
+                p.電話.Contains(keyword));
+            }
+
+            return View("Index", 客戶聯絡人);
         }
 
         // GET: 客戶聯絡人/Details/5

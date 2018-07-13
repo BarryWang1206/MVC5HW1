@@ -6,8 +6,9 @@ using System.Web.Mvc;
 
 namespace MVC5HW1.Controllers
 {
-    public class HomeController : Controller
+    public class HomeController : BaseController
     {
+
         public ActionResult Index()
         {
             return View();
@@ -27,9 +28,12 @@ namespace MVC5HW1.Controllers
             return View();
         }
 
-        public ActionResult CUSDataMgmt()
+        //Action 客戶相關統計
+        public ActionResult CusStatistics()
         {
-            return View("Index");
+            var data = db.viwCusStatistics;
+
+            return View(data.AsQueryable());
         }
     }
 }

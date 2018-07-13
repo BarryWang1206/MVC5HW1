@@ -10,15 +10,32 @@ using MVC5HW1.Models;
 
 namespace MVC5HW1.Controllers
 {
-    public class 客戶銀行資訊Controller : Controller
+    public class 客戶銀行資訊Controller : BaseController
     {
         private 客戶資料Entities db = new 客戶資料Entities();
 
         // GET: 客戶銀行資訊
         public ActionResult Index()
         {
-            var 客戶銀行資訊 = db.客戶銀行資訊.Include(客 => 客.客戶資料);
+            var 客戶銀行資訊 = db.客戶銀行資訊.Include(p => p.客戶資料);
             return View(客戶銀行資訊.ToList());
+        }
+
+        //關鍵字查詢
+        public ActionResult Search(string keyword)
+        {
+            var 客戶銀行資訊 = db.客戶銀行資訊.AsQueryable();
+
+            if (!string.IsNullOrEmpty(keyword))
+            {
+                客戶銀行資訊 = 客戶銀行資訊.Where(p => p.銀行名稱.Contains(keyword) ||
+                p.銀行代碼.ToString().Contains(keyword) ||
+                p.分行代碼.ToString().Contains(keyword) ||
+                p.帳戶名稱.Contains(keyword) ||
+                p.帳戶號碼.Contains(keyword));
+            }
+
+            return View("Index", 客戶銀行資訊);
         }
 
         // GET: 客戶銀行資訊/Details/5
